@@ -21,7 +21,8 @@ router.get('/ready', async (req, res) => {
   const checks = await Promise.allSettled(
     Object.entries(config.services).map(async ([name, baseURL]) => {
       const client = createServiceClient(baseURL, name);
-      await client.get('/health', { timeout: 1500 });
+      const healthPath = config.serviceHealthPaths[name] || '/health';
+      await client.get(healthPath, { timeout: 1500 });
       return name;
     })
   );

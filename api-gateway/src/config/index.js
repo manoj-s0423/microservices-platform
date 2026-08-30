@@ -37,6 +37,19 @@ const config = {
     notification: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8084',
   },
 
+  // Every service's liveness endpoint, keyed the same as `services` above.
+  // user-service is Spring Boot and uses Actuator's `/actuator/health`
+  // convention rather than the plain `/health` the other four services
+  // expose - this map is what lets /ready poll each service correctly
+  // instead of assuming one path fits all languages/frameworks.
+  serviceHealthPaths: {
+    user: '/actuator/health',
+    product: '/health',
+    order: '/health',
+    payment: '/health',
+    notification: '/health',
+  },
+
   http: {
     timeoutMs: parseInt(process.env.HTTP_TIMEOUT_MS || '3000', 10),
     retryAttempts: parseInt(process.env.HTTP_RETRY_ATTEMPTS || '2', 10),

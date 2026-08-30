@@ -22,8 +22,8 @@ describe('GET /ready', () => {
   afterEach(() => nock.cleanAll());
 
   test('returns 200 when all downstream services are healthy', async () => {
-    Object.values(config.services).forEach((baseURL) => {
-      nock(baseURL).get('/health').reply(200, { status: 'UP' });
+    Object.entries(config.services).forEach(([name, baseURL]) => {
+      nock(baseURL).get(config.serviceHealthPaths[name]).reply(200, { status: 'UP' });
     });
 
     const res = await request(app).get('/ready');
@@ -32,11 +32,12 @@ describe('GET /ready', () => {
   });
 
   test('returns 503 when a downstream dependency is unavailable', async () => {
-    const urls = Object.values(config.services);
+    const entries = Object.entries(config.services);
     // First dependency is down; rest are healthy.
-    nock(urls[0]).get('/health').replyWithError({ code: 'ECONNREFUSED' });
-    urls.slice(1).forEach((baseURL) => {
-      nock(baseURL).get('/health').reply(200, { status: 'UP' });
+    const [firstName, firstUrl] = entries[0];
+    nock(firstUrl).get(config.serviceHealthPaths[firstName]).replyWithError({ code: 'ECONNREFUSED' });
+    entries.slice(1).forEach(([name, baseURL]) => {
+      nock(baseURL).get(config.serviceHealthPaths[name]).reply(200, { status: 'UP' });
     });
 
     const res = await request(app).get('/ready');

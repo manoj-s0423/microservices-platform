@@ -1,0 +1,49 @@
+'use strict';
+
+require('dotenv').config();
+
+function requireEnv(name, fallback) {
+  const value = process.env[name] ?? fallback;
+  if (value === undefined) {
+    // Intentionally do not throw at import time for every optional var;
+    // JWT_SECRET is validated separately at startup (see index.js) so that
+    // "incorrect/missing environment variable" is a reproducible, isolated
+    // failure scenario rather than a crash-on-import surprise.
+    return undefined;
+  }
+  return value;
+}
+
+const config = {
+  env: process.env.NODE_ENV || 'development',
+  port: parseInt(process.env.PORT || '3000', 10),
+  logLevel: process.env.LOG_LEVEL || 'info',
+
+  jwtSecret: requireEnv('JWT_SECRET'),
+  corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || '*')
+    .split(',')
+    .map((s) => s.trim()),
+
+  rateLimit: {
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
+  },
+
+  services: {
+    user: process.env.USER_SERVICE_URL || 'http://localhost:8081',
+    product: process.env.PRODUCT_SERVICE_URL || 'http://localhost:8000',
+    order: process.env.ORDER_SERVICE_URL || 'http://localhost:8082',
+    payment: process.env.PAYMENT_SERVICE_URL || 'http://localhost:8083',
+    notification: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8084',
+  },
+
+  http: {
+    timeoutMs: parseInt(process.env.HTTP_TIMEOUT_MS || '3000', 10),
+    retryAttempts: parseInt(process.env.HTTP_RETRY_ATTEMPTS || '2', 10),
+    retryDelayMs: parseInt(process.env.HTTP_RETRY_DELAY_MS || '200', 10),
+  },
+
+  shutdownTimeoutMs: parseInt(process.env.SHUTDOWN_TIMEOUT_MS || '10000', 10),
+};
+
+module.exports = config;

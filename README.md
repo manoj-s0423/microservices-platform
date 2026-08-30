@@ -78,6 +78,13 @@ dependencies, database requirements, API endpoints, health/readiness
 endpoints, and service-to-service dependencies — everything needed to
 write its Dockerfile and Jenkins stage without reading the source.
 
+> **Cross-service config gotcha**: api-gateway and user-service's
+> `JWT_SECRET` must be set to the **identical value** — user-service issues
+> tokens, the gateway only verifies them. A mismatch doesn't fail startup
+> on either side; it silently fails every authenticated request at runtime
+> with `401 invalid_token`. Worth a shared secret (or Kubernetes Secret)
+> rather than two independently-generated values per environment.
+
 ## Repository structure
 
 ```text

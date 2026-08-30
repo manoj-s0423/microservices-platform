@@ -54,7 +54,7 @@ See [.env.example](.env.example).
 | `SERVER_PORT` | no (8081) | HTTP port |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USER` / `DB_PASSWORD` | yes | PostgreSQL connection |
 | `DB_POOL_SIZE` | no (10) | HikariCP max pool size |
-| `JWT_SECRET` | **yes** | HMAC signing key. App **refuses to start** if unset (see `JwtUtil.init()`) — a deliberate "incorrect env var" failure scenario. |
+| `JWT_SECRET` | **yes** | HMAC signing key. **Must be set to the exact same value as api-gateway's `JWT_SECRET`** — user-service issues tokens, the gateway only verifies them, and a mismatch produces `401 invalid_token` at the gateway with no error here. App **refuses to start** if unset entirely (see `JwtUtil.init()`) — a deliberate "incorrect env var" failure scenario. |
 | `JWT_EXPIRATION_MS` | no (3600000) | Token TTL |
 
 ## Dependencies

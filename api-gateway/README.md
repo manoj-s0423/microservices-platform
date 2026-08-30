@@ -47,7 +47,7 @@ See [.env.example](.env.example). Key variables:
 | Variable | Required | Description |
 |---|---|---|
 | `PORT` | no (default 3000) | HTTP port |
-| `JWT_SECRET` | **yes** | HMAC secret for verifying tokens issued by user-service. Auth routes fail with `500 server_misconfigured` if unset — a deliberate, reproducible misconfiguration scenario. |
+| `JWT_SECRET` | **yes** | HMAC secret for verifying tokens issued by user-service. **Must be set to the exact same value as user-service's `JWT_SECRET`** — the gateway only verifies tokens, it never issues them, so a mismatch here doesn't fail startup, it fails every authenticated request at runtime with `401 invalid_token`. Auth routes fail with `500 server_misconfigured` if unset entirely — a deliberate, reproducible misconfiguration scenario. |
 | `USER_SERVICE_URL` | yes | Base URL for user-service |
 | `PRODUCT_SERVICE_URL` | yes | Base URL for product-service |
 | `ORDER_SERVICE_URL` | yes | Base URL for order-service |

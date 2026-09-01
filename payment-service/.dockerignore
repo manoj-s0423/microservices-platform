@@ -1,0 +1,38 @@
+# .NET build output — must be excluded, or a stray local bin/obj built
+# on your host (different SDK patch version, different OS) can get
+# copied into the image and silently override what the container's own
+# `dotnet publish` produces.
+**/bin/
+**/obj/
+
+# IDE / tooling
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Git
+.git
+.gitignore
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Test project — never needed inside this image; also excluded
+# explicitly in the Dockerfile itself by only COPYing PaymentService.Api.
+tests/
+
+# Logs / OS cruft
+*.log
+.DS_Store
+Thumbs.db
+
+# Docs, not needed inside the image
+README.md
+
+# Docker-related files themselves
+Dockerfile
+.dockerignore

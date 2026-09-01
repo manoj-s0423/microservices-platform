@@ -1,0 +1,27 @@
+# Keep the build context small and prevent things that should never be
+# baked into an image from accidentally landing in one.
+
+node_modules
+npm-debug.log*
+
+# Real secrets. .env.example is fine (and useful as documentation) — the
+# leading "!" un-ignores it after the .env* rule above excludes it.
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+
+# Dev-only content the image doesn't need at runtime.
+test
+coverage
+.vscode
+.idea
+.DS_Store
+*.log
+
+# Not needed inside the image itself.
+Dockerfile
+.dockerignore
+README.md

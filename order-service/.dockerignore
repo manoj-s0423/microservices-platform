@@ -1,0 +1,43 @@
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Go build output
+app
+*.exe
+*.test
+*.out
+
+# Logs
+*.log
+
+# Test / coverage
+coverage.out
+coverage.html
+coverage/
+tmp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+

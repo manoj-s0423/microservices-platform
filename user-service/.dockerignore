@@ -1,0 +1,40 @@
+
+# Maven
+target/
+.mvn/
+
+# Gradle, if applicable
+.gradle/
+build/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Test reports
+surefire-reports/
+failsafe-reports/
+

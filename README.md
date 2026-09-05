@@ -18,29 +18,49 @@ DevOps team's own build, so they can be practiced from scratch. See
 
 ```mermaid
 flowchart TB
-    Client([Client / Browser])
-    GW[API Gateway<br/>Node.js · Express<br/>:3000]
+    Client(["Client / Browser"])
 
-    Client --> GW
+    subgraph GWG["API Gateway — Node.js/Express :3000"]
+        GW["Auth verification (JWT)<br/>Rate limiting · Request routing"]
+    end
 
-    GW --> US[User Service<br/>Java · Spring Boot<br/>:8081]
-    GW --> PS[Product Service<br/>Python · FastAPI<br/>:8000]
-    GW --> OS[Order Service<br/>Go · Gin<br/>:8082]
+    subgraph SVC["Backend Services"]
+        US["User Service<br/>Java 21 · Spring Boot<br/>:8081"]
+        PS["Product Service<br/>Python · FastAPI<br/>:8000"]
+        OS["Order Service<br/>Go · Gin<br/>:8082"]
+        PAY["Payment Service<br/>.NET 8 · ASP.NET Core<br/>:8083"]
+        NOTIF["Notification Service<br/>TypeScript · Express<br/>:8084"]
+    end
+
+    subgraph DATA["Data Layer — one database per service"]
+        USDB[("PostgreSQL<br/>shopstream_users")]
+        PSDB[("PostgreSQL<br/>shopstream_products")]
+        OSDB[("PostgreSQL<br/>shopstream_orders")]
+        PAYDB[("PostgreSQL<br/>shopstream_payments")]
+        NOTIFDB[("MongoDB<br/>shopstream_notifications")]
+    end
+
+    EXT[["Card Gateway<br/>external, 3rd-party"]]
+    EMAIL[["Email/SMS Providers<br/>external, 3rd-party"]]
+
+    Client -->|HTTPS| GW
+
+    GW -->|"/api/v1/auth/*, /users/*"| US
+    GW -->|"/api/v1/products/*"| PS
+    GW -->|"/api/v1/orders/*"| OS
 
     OS -.verify user.-> US
     OS -.price + stock.-> PS
-    OS ==charge==> PAY[Payment Service<br/>.NET · ASP.NET Core<br/>:8083]
+    OS =="charge (Idempotency-Key)"==> PAY
 
-    PAY -.external.-> EXT[[Card Gateway<br/>external, 3rd-party]]
+    PAY -.external, when live.-> EXT
+    NOTIF -.external, when live.-> EMAIL
 
-    NOTIF[Notification Service<br/>Node.js · TypeScript<br/>:8084]
-    NOTIF -.external.-> EMAIL[[Email Provider<br/>external, 3rd-party]]
-
-    US --> USDB[(PostgreSQL<br/>shopstream_users)]
-    PS --> PSDB[(PostgreSQL<br/>shopstream_products)]
-    OS --> OSDB[(PostgreSQL<br/>shopstream_orders)]
-    PAY --> PAYDB[(PostgreSQL<br/>shopstream_payments)]
-    NOTIF --> NOTIFDB[(MongoDB<br/>shopstream_notifications)]
+    US --> USDB
+    PS --> PSDB
+    OS --> OSDB
+    PAY --> PAYDB
+    NOTIF --> NOTIFDB
 
     classDef svc fill:#e8f0fe,stroke:#4c6ef5,color:#1a1a2e;
     classDef db fill:#fff3bf,stroke:#e8a33d,color:#1a1a2e;

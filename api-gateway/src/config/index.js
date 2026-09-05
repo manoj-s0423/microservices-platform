@@ -20,9 +20,17 @@ const config = {
   logLevel: process.env.LOG_LEVEL || 'info',
 
   jwtSecret: requireEnv('JWT_SECRET'),
-  corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || '*')
-    .split(',')
-    .map((s) => s.trim()),
+  // The `cors` package treats an array as an exact-match allowlist - an
+  // array containing the string '*' means "allow an Origin header that
+  // is literally the four characters *", which no real browser ever
+  // sends, NOT "allow everything". Passing the bare string '*' (not
+  // wrapped in an array) is what actually triggers cors' wildcard
+  // behavior. So the default case and the explicit-whitelist case need
+  // different shapes, not just different values.
+  corsAllowedOrigins:
+    !process.env.CORS_ALLOWED_ORIGINS || process.env.CORS_ALLOWED_ORIGINS === '*'
+      ? '*'
+      : process.env.CORS_ALLOWED_ORIGINS.split(',').map((s) => s.trim()),
 
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
